@@ -7,6 +7,9 @@ import TableBody from '@material-ui/core/TableBody';
 import Button from '@material-ui/core/Button';
 import axios from 'axios';
 import TextField from '@material-ui/core/TextField';
+import alertify from 'alertifyjs';
+import 'alertifyjs/build/css/alertify.min.css';
+import 'alertifyjs/build/css/themes/default.css';
 
 class Libro extends Component {
 
@@ -36,7 +39,7 @@ class Libro extends Component {
 
       axios.post(`http://localhost:3000/libro`, data)
       .then(res => {
-        alert("El libro fue creado exitosamente!");
+        alertify.success('El libro fue creado exitosamente!'); 
         this.getLibros();
         this.props.noAdd();
         console.log(res);
@@ -63,12 +66,13 @@ class Libro extends Component {
   }
 
   onDelete = (codigo, nombre) => {
-    if(window.confirm(`¿Desea eliminar el libro ${nombre}?`)){
+    alertify.confirm('Eliminar',`¿Desea eliminar el libro ${nombre}?`,() => {
       axios.delete(`http://localhost:3000/libro/${codigo}`)
-        .then(()=> {
-          this.getLibros();
-        })
-    }
+      .then(()=> {
+        alertify.success('El libro fue eliminado exitosamente!'); 
+        this.getLibros();
+      })
+    }, () => {});
   }
 
   onEdit = (codigo, nombre, autor, cantidad) => {
@@ -108,7 +112,14 @@ class Libro extends Component {
 
     axios.put(`http://localhost:3000/libro/${this.state.codigo}`, data)
     .then(res => {
-      alert("Se ha modificado un libro exitosamente");
+      alertify.success("Se ha modificado un libro exitosamente");
+      this.setState({
+        codigo: '',
+        nombre: '',
+        autor: '',
+        cantidad: '',
+        botones: false
+      });
       this.getLibros();
     })
 
@@ -155,7 +166,7 @@ class Libro extends Component {
             onChange={this.onChange}
             margin="normal"
           />
-          {this.state.botones ? <div><Button type="submit" variant="outlined" color="primary" style={{marginLeft:5+'px'}} >Guardar cambios</Button><Button variant="outlined" color="secondary" style={{marginLeft:5+'px'}}>Cancelar</Button></div>:''}
+          {this.state.botones ? <div><Button type="submit" variant="outlined" color="primary" style={{marginLeft:5+'px'}} >Guardar cambios</Button></div>:''}
         </form>
         <br />
         <Table>
